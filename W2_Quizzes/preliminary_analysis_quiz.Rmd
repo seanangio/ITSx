@@ -1,0 +1,75 @@
+---
+title: "Preliminary Analysis Quiz"
+author: "Sean Angiolillo"
+date: "3/13/2018"
+output: 
+  html_document: 
+    keep_md: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+To continue this week's problem set, please use the West Virginia dataset and the steps outlined in this Unit to:
+
+* Perform a linear regression with a segmented regression specification
+
+* Have R report a summary of the results
+
+```{r message=FALSE}
+library(readr)
+dat <- read_csv("antipsychotic_study.csv")
+dat$time <- 1:nrow(dat)
+dat$level <- c(rep(0,8),rep(1,11))
+dat$trend <- c(rep(0,8), 1:11)
+
+model_ols <- lm(marketshare ~ time + level + trend, data=dat)
+summary(model_ols)
+confint(model_ols)
+```
+
+
+## Question 1
+
+With reference to the standard regression for the West Virginia data, what are your estimates of the following variables:
+
+The existing level?
+
+```{r}
+coef(model_ols)[1]
+```
+
+ The pre-existing trend per quarter?
+
+```{r}
+coef(model_ols)[2]
+```
+ 
+The estimated level change following the prior authorization policy?
+
+```{r}
+coef(model_ols)[3]
+```
+
+The estimated change in the trend per quarter following the policy change?
+
+```{r}
+coef(model_ols)[4]
+```
+
+
+## Question 2
+
+Based on your standard model results, did the policy in West Viginia lead to a:
+
+* Level increase in market share
+
+* Level increase and trend decrease in market share
+
+* Trend decrease in market share
+
+* **Level decrease and trend decrease in market share**
+
+*Explanation*
+The results of the model suggest a statistically significant decrease in both the level and trend of market share following the start of the prior authorization policy.

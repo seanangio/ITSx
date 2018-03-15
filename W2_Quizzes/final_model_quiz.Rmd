@@ -1,0 +1,58 @@
+---
+title: "Final Model Quiz"
+author: "Sean Angiolillo"
+date: "3/14/2018"
+output: 
+  html_document: 
+    keep_md: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Thinking back to the last exercise, run the model which you determined was the best to deal with any autocorrelation issues in the West Virginia Dataset.
+
+After running that model, perform checks to assess the following comparisons and report the p-values for the likelihood ratio tests.
+
+```{r message=FALSE}
+# Load the necessary libraries
+library(nlme)
+library(car)
+library(readr)
+
+# Read in the dataset
+dat <- read_csv("antipsychotic_study.csv")
+
+# add time, level and trend variables
+dat$time <- 1:nrow(dat)
+dat$level <- c(rep(0,8),rep(1,11))
+dat$trend <- c(rep(0,8), 1:11)
+
+# Fit the GLS regression model
+model_final <- gls(marketshare ~ time + level + trend,
+  data = dat,
+  correlation = NULL,
+  method = "ML")
+
+summary(model_final)
+```
+
+## Question 1
+
+Compare the final model based on the ACF and PACF plots to one with 1 additional AR() term. What is the p-value?
+
+```{r}
+# Compare to 1 additional AR term
+model_p1 <- update(model_final, correlation = corARMA(p = 1,form = ~time))
+anova(model_final, model_p1)$p
+```
+
+Perform the same comparison to a model with 1 additional MA() term. What is the p-value for this comparison?
+
+```{r}
+# And now to 1 additional MA term
+model_q1 <- update(model_final, correlation = corARMA(q = 1,form = ~time))
+anova(model_final,model_q1)$p
+```
+

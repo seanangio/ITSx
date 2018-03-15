@@ -1,0 +1,108 @@
+---
+title: "Autocorrelation Quiz"
+author: "Sean Angiolillo"
+date: "3/13/2018"
+output: 
+  html_document: 
+    keep_md: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+To continue this week's problem set, please use the West Virginia dataset and the steps outlined in this Unit to:
+
+* Perform a Durbin Watson test up to 8 lag periods
+
+* Produce ACF and PACF plots
+
+* Assess the above plots for potential AR() and MA() processes
+
+After you have completed these steps, please answer the questions below.
+
+```{r message=FALSE}
+# Load the necessary libraries
+library(nlme)
+library(car)
+library(readr)
+
+# Read in the dataset
+dat <- read_csv("antipsychotic_study.csv")
+
+# add time, level and trend variables
+dat$time <- 1:nrow(dat)
+dat$level <- c(rep(0,8),rep(1,11))
+dat$trend <- c(rep(0,8), 1:11)
+
+# A preliminary OLS regression
+model_ols <- lm(marketshare ~ time + level + trend, data = dat)
+
+# Durbin-watson test, 8 time periods
+dwt(model_ols, max.lag = 8, alternative = "two.sided")
+
+# Graph the residuals from the OLS regression to check for serially correlated errors
+plot(dat$time,
+     residuals(model_ols),
+     type = 'o',
+     pch = 16,
+     xlab = 'Time',
+     ylab = 'OLS Residuals',
+     col = "red")
+abline(h = 0,lty = 2)
+```
+```{r}
+# Plot ACF and PACF
+par(mfrow = c(1,2))
+acf(residuals(model_ols), main = "ACF")
+acf(residuals(model_ols), type = 'partial', main = "PACF")
+```
+
+## Question 1
+
+On what lag values of the Durbin Watson test is the statistic significantly different from 2?
+
+* 1
+
+* 2
+
+* 3
+
+* 4
+
+* 5
+
+* 6
+
+* 7
+
+* 8
+
+* **None of the above**
+
+*Explanation*
+The Durbin-Watson test does not indicate any values that are significantly different from 2 at the p < 0.05 level.
+
+### Autocorrelation Plots
+Please select which plot resembles the one you produced for the West Virginia data:
+
+![Image 1](AutoCorTest1.png)
+
+![Image 2](AutoCorTest2.png)
+
+## Question 2
+
+Which of the plots above resembles the ones you produced?
+
+* Image 1
+
+* **Image 2**
+
+Based on these plots, what AR() and MA() parameters would you use in your final model?
+
+**AR: 0**
+
+**MA: 0**
+
+*Explanation*
+There are no indications of significiant spikes in either the ACF or PACF for this data, suggesting that no AR() or MA() process underlies the data.
